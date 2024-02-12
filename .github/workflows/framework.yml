@@ -3,10 +3,10 @@ name: Java CI with Redis
 on:
   push:
     branches:
-      - '*'
+      - 'master'
   pull_request:
     branches:
-      - '*'
+      - 'master'
 
 jobs:
   build:
@@ -22,20 +22,16 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Set up JDK 8 and Maven
+    - name: Set up JDK 8
       uses: actions/setup-java@v2
       with:
         java-version: '8'
         distribution: 'temurin'
         cache: maven
 
-    - name: Verify Maven Wrapper
-      run: chmod +x mvnw
+    - name: Install dependencies
+      run: mvn -q install -Dgpg.skip
 
-    - name: Run Maven install
-      run: ./mvnw -q install -Dgpg.skip
-
-    - name: Run Maven test
-      run: ./mvnw -q test
-
+    - name: Run tests
+      run: mvn -q test
 
