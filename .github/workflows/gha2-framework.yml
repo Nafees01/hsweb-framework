@@ -1,43 +1,29 @@
-matrix:
-  language: java
-  java
-  os: ubuntu-latest
-
 name: placeholder_Name
 
 on:
-  pull_request
+  pull_request: {}
   push:
     branches:
-    - branch-2
+      - branch-2
 
 jobs:
   build:
-    strategy:
-      matrix: java
-      fail-fast: FALSE
-  - name: Placeholder
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java-version: ['1.8'] 
+      fail-fast: false
     steps:
-      with: path
+    - uses: actions/checkout@v2 
+
+    - name: Set up JDK
+      uses: actions/setup-java@v2 
       with:
-        java-version:
-          ${{ matrix.java }}
-          1.8
-      with: key
-      with: java-version
-      uses: actions/checkout@version
-      uses: actions/setup-java@version
-    - name: set up jdk 1.8
-      with:
-        path: ~/.maven-
-        key: ${{ runner.os }}-maven-${{ hashfiles(arg) }}
-      uses: actions/cache@version
-      run:
-        bash <(curl -s https://codecov.io/bash)
-        ./mvnw -q test
+        java-version: ${{ matrix.java-version }}
+        distribution: 'temurin' # Specify distribution
+        cache: maven
+
+    - name: Build and test with Maven
+      run: |
         chmod +x mvnw
-
-macos:
-  jdk: openjdk8
-
+        ./mvnw -q test
