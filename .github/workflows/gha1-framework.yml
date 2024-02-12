@@ -1,27 +1,43 @@
 name: gha-result
+
 on:
   workflow_dispatch:
   push:
     branches:
-    - branch-1
+      - branch-1
+
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+
     steps:
-    - name: checkout
+    - name: Checkout
       uses: actions/checkout@v3.5.0
+
     - name: Set up cache
       uses: actions/cache@v3.3.1
       with:
-        path: "${{ github.workspace }}/.m2/repository"
-        key: "${{ runner.os }}-path"
-    - uses: actions/setup-java@v3.12.0
+        path: ${{ github.workspace }}/.m2/repository
+        key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+
+    - name: Set up Java
+      uses: actions/setup-java@v3.12.0
       with:
         distribution: zulu
         java-version: '8'
-#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
-    - run: chmod +x mvnw
-    - run: sudo redis-server /etc/redis/redis.conf --port 6379
-    - run: "./mvnw -q test"
-    - run: bash <(curl -s https://codecov.io/bash)
-      if: "${{ success() }}"
+
+    - name: Make Maven Wrapper Executable
+      run: chmod +x mvnw
+
+    - name: Run tests
+      run: ./mvnw -q test
+
+    - name: Upload coverage to Codecov
+      run: bash <(curl -s https://codecov.io/bash)
+      if: ${{ success() }}
