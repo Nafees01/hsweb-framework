@@ -3,10 +3,10 @@ name: Java CI with Redis
 on:
   push:
     branches:
-      - 'master'
+      - '*'
   pull_request:
     branches:
-      - 'master'
+      - '*'
 
 jobs:
   build:
@@ -22,14 +22,14 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Set up JDK 8
+    - name: Set up JDK 8 and Maven
       uses: actions/setup-java@v2
       with:
         java-version: '8'
         distribution: 'temurin'
         cache: maven
 
-    - name: Make Maven Wrapper executable
+    - name: Verify Maven Wrapper
       run: chmod +x mvnw
 
     - name: Run Maven install
@@ -38,13 +38,4 @@ jobs:
     - name: Run Maven test
       run: ./mvnw -q test
 
-    - name: Upload coverage to Codecov
-      run: bash <(curl -s https://codecov.io/bash)
 
-    - name: Cache Maven packages
-      uses: actions/cache@v2
-      with:
-        path: ~/.m2
-        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-m2-
