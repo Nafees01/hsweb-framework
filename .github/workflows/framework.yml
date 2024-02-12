@@ -1,0 +1,45 @@
+name: Java CI with Redis
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        options: --entrypoint redis-server
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up JDK 8
+      uses: actions/setup-java@v2
+      with:
+        java-version: '1.8'
+        distribution: 'adopt'
+        cache: maven
+
+    - name: Before Install
+      run: chmod +x mvnw
+
+    - name: Before Script
+      run: sudo redis-server /etc/redis/redis.conf --port 6379
+      
+    - name: Run tests
+      run: ./mvnw -q test
+
+    - name: Cache Maven packages
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-m2-
