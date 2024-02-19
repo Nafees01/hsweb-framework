@@ -8,6 +8,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      MAVEN_VERSION: '3.8.4'
     steps:
     - name: Checkout
       uses: actions/checkout@v3.5.0
@@ -23,6 +25,12 @@ jobs:
       with:
         distribution: zulu
         java-version: '8'
+
+    - name: Download Apache Maven
+      run: |
+        wget -q "https://apache.osuosl.org/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz"
+        tar xf "apache-maven-${MAVEN_VERSION}-bin.tar.gz"
+        export PATH=$(pwd)/apache-maven-${MAVEN_VERSION}/bin:$PATH
 
     - name: Make mvnw executable
       run: chmod +x mvnw
