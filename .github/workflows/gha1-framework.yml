@@ -8,8 +8,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      MAVEN_VERSION: '3.8.4'
     steps:
     - name: Checkout
       uses: actions/checkout@v3.5.0
@@ -26,17 +24,38 @@ jobs:
         distribution: zulu
         java-version: '8'
 
-    - name: Download Apache Maven
+    - name: Configure Maven
       run: |
-        wget -q "https://apache.osuosl.org/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz"
-        tar xf "apache-maven-${MAVEN_VERSION}-bin.tar.gz"
-        export PATH=$(pwd)/apache-maven-${MAVEN_VERSION}/bin:$PATH
+        mkdir -p $HOME/.m2
+        echo "[settings]" >> $HOME/.m2/settings.xml
+        echo "  localRepository = \${env.HOME}/.m2/repository" >> $HOME/.m2/settings.xml
+        echo "[repositories]" >> $HOME/.m2/settings.xml
+        echo "  [repository]" >> $HOME/.m2/settings.xml
+        echo "    id = central" >> $HOME/.m2/settings.xml
+        echo "    url = https://repo.maven.apache.org/maven2" >> $HOME/.m2/settings.xml
+        echo "[profiles]" >> $HOME/.m2/settings.xml
+        echo "  [profile]" >> $HOME/.m2/settings.xml
+        echo "    id = default" >> $HOME/.m2/settings.xml
+        echo "    repositories = central" >> $HOME/.m2/settings.xml
+        echo "  [profile]" >> $HOME/.m2/settings.xml
+        echo "    id = repo-1" >> $HOME/.m2/settings.xml
+        echo "    url = https://repo.maven.apache.org/maven2" >> $HOME/.m2/settings.xml
+        echo "    repositories = central" >> $HOME/.m2/settings.xml
+        echo "  [profile]" >> $HOME/.m2/settings.xml
+        echo "    id = apache.snapshots" >> $HOME/.m2/settings.xml
+        echo "    url = https://repository.apache.org/snapshots" >> $HOME/.m2/settings.xml
+        echo "    repositories = central" >> $HOME/.m2/settings.xml
+        echo "[activeProfiles]" >> $HOME/.m2/settings.xml
+        echo "  activeProfile = default" >> $HOME/.m2/settings.xml
+        echo "  activeProfile = repo-1" >> $HOME/.m2/settings.xml
+        echo "  activeProfile = apache.snapshots" >> $HOME/.m2/settings.xml
+        export PATH="/c/Program Files/apache-maven-3.6.3-bin/apache-maven-3.6.3/bin:$PATH"
 
     - name: Make mvnw executable
       run: chmod +x mvnw
 
     - name: Run Maven tests
-      run: "./mvnw -q test"
+      run: mvn -q test
 
     - name: Upload coverage report
       if: success()
