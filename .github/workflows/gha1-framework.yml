@@ -15,10 +15,11 @@ jobs:
       with:
         path: "${{ github.workspace }}/.m2/repository"
         key: "${{ runner.os }}-path"
-    - name: Set up JDK 8 with Maven
-      uses: actions/setup-java@v2
-      with:
-        java-version: '8'
+    - name: Download Apache Maven
+      run: |
+        wget -q https://apache.osuosl.org/maven/maven-3/3.8.4/binaries/apache-maven-3.8.4-bin.tar.gz
+        tar xf apache-maven-3.8.4-bin.tar.gz
+        export PATH=$(pwd)/apache-maven-3.8.4/bin:$PATH
     - name: Make mvnw executable
       run: chmod +x mvnw
     - name: Start Redis Server
