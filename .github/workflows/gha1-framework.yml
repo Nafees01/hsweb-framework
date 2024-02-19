@@ -4,29 +4,42 @@ on:
   push:
     branches:
     - branch-1
+
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis
+        options: --name my-redis
+        ports:
+          - 6379:6379
     steps:
-    - name: checkout
+    - name: Checkout
       uses: actions/checkout@v3.5.0
+
     - name: Set up cache
       uses: actions/cache@v3.3.1
       with:
         path: "${{ github.workspace }}/.m2/repository"
         key: "${{ runner.os }}-path"
-    - uses: actions/setup-java@v3.12.0
+
+    - name: Set up Java
+      uses: actions/setup-java@v3.12.0
       with:
         distribution: zulu
         java-version: '8'
+
     - name: Make mvnw executable
       run: chmod +x mvnw
-    - name: Start Redis Server
+
+    - name: Run Redis tests
       run: |
-        redis-server --daemonize yes
-        sleep 5
+        redis-cli -h my-redis ping
+
     - name: Run Maven tests
       run: "./mvnw -q test"
+
     - name: Upload coverage report
       if: success()
       run: bash <(curl -s https://codecov.io/bash)
