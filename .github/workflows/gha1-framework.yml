@@ -1,41 +1,30 @@
-name: Java CI with Redis
-
+name: gha-result
 on:
+  workflow_dispatch:
   push:
     branches:
-      - 'branch-1'
-  pull_request:
-    branches:
-      - 'branch-1'
-
+    - branch-1
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
-
-    services:
-      redis:
-        image: redis
-        ports:
-          - 6379:6379
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-
-    - name: Set up JDK 11
+    - name: checkout
+      uses: actions/checkout@v3.5.0
+    - name: Set up cache
+      uses: actions/cache@v3.3.1
+      with:
+        path: "${{ github.workspace }}/.m2/repository"
+        key: "${{ runner.os }}-path"
+    - name: Set up JDK 8 with Maven
       uses: actions/setup-java@v2
       with:
-        java-version: '11'
-        distribution: 'temurin'
-        cache: maven
-
-    - name: Cache Maven packages
-      uses: actions/cache@v2
-      with:
-        path: ~/.m2
-        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-maven-
-
-    - name: Run Maven install and test
-      run: mvn -q install test -Dgpg.skip
+        java-version: '8'
+    - name: Make mvnw executable
+      run: chmod +x mvnw
+    - name: Start Redis Server
+      run: sudo redis-server /etc/redis/redis.conf --port 6379
+    - name: Run Maven tests
+      run: "./mvnw -q test"
+    - name: Upload coverage report
+      if: success()
+      run: bash <(curl -s https://codecov.io/bash)
