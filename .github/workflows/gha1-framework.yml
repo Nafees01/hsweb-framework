@@ -27,29 +27,7 @@ jobs:
     - name: Configure Maven
       run: |
         mkdir -p $HOME/.m2
-        echo "[settings]" >> $HOME/.m2/settings.xml
-        echo "  localRepository = \${env.HOME}/.m2/repository" >> $HOME/.m2/settings.xml
-        echo "[repositories]" >> $HOME/.m2/settings.xml
-        echo "  [repository]" >> $HOME/.m2/settings.xml
-        echo "    id = central" >> $HOME/.m2/settings.xml
-        echo "    url = https://repo.maven.apache.org/maven2" >> $HOME/.m2/settings.xml
-        echo "[profiles]" >> $HOME/.m2/settings.xml
-        echo "  [profile]" >> $HOME/.m2/settings.xml
-        echo "    id = default" >> $HOME/.m2/settings.xml
-        echo "    repositories = central" >> $HOME/.m2/settings.xml
-        echo "  [profile]" >> $HOME/.m2/settings.xml
-        echo "    id = repo-1" >> $HOME/.m2/settings.xml
-        echo "    url = https://repo.maven.apache.org/maven2" >> $HOME/.m2/settings.xml
-        echo "    repositories = central" >> $HOME/.m2/settings.xml
-        echo "  [profile]" >> $HOME/.m2/settings.xml
-        echo "    id = apache.snapshots" >> $HOME/.m2/settings.xml
-        echo "    url = https://repository.apache.org/snapshots" >> $HOME/.m2/settings.xml
-        echo "    repositories = central" >> $HOME/.m2/settings.xml
-        echo "[activeProfiles]" >> $HOME/.m2/settings.xml
-        echo "  activeProfile = default" >> $HOME/.m2/settings.xml
-        echo "  activeProfile = repo-1" >> $HOME/.m2/settings.xml
-        echo "  activeProfile = apache.snapshots" >> $HOME/.m2/settings.xml
-        export PATH="/c/Program Files/apache-maven-3.6.3-bin/apache-maven-3.6.3/bin:$PATH"
+        echo "<settings><localRepository>${{ github.workspace }}/.m2/repository</localRepository></settings>" > $HOME/.m2/settings.xml
 
     - name: Make mvnw executable
       run: chmod +x mvnw
