@@ -28,13 +28,13 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: Download Apache Maven
-  run: |
-    MAVEN_VERSION=3.8.4
-    wget -q https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz
-    tar xf apache-maven-${MAVEN_VERSION}-bin.tar.gz
-    echo "M2_HOME=$PWD/apache-maven-${MAVEN_VERSION}" >> $GITHUB_ENV
-    echo "$PWD/apache-maven-${MAVEN_VERSION}/bin" >> $GITHUB_PATH
-          
+        run: |
+          MAVEN_VERSION=3.8.4
+          wget -q https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz
+          tar xf apache-maven-${MAVEN_VERSION}-bin.tar.gz
+          echo "M2_HOME=$PWD/apache-maven-${MAVEN_VERSION}" >> $GITHUB_ENV
+          echo "$PWD/apache-maven-${MAVEN_VERSION}/bin" >> $GITHUB_PATH
+
       - name: Run Maven tests
         run: mvn -q test
 
