@@ -8,12 +8,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    services:
-      redis:
-        image: redis
-        options: --name my-redis
-        ports:
-          - 6379:6379
     steps:
     - name: Checkout
       uses: actions/checkout@v3.5.0
@@ -32,10 +26,6 @@ jobs:
 
     - name: Make mvnw executable
       run: chmod +x mvnw
-
-    - name: Run Redis tests
-      run: |
-        redis-cli -h my-redis ping
 
     - name: Run Maven tests
       run: "./mvnw -q test"
