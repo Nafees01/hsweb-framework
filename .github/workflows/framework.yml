@@ -7,7 +7,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     services:
@@ -25,13 +24,15 @@ jobs:
       uses: actions/setup-java@v2
       with:
         java-version: '11'
-        distribution: 'adopt'
+        distribution: 'temurin' # Changed from 'adopt' to 'temurin'
 
-    - name: Make mvnw executable
-      run: chmod +x mvnw
+    - name: Install Maven
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y maven
 
     - name: Build and test with Maven
-      run: ./mvnw -q test
+      run: mvn -q test # Changed from ./mvnw to mvn
 
     - name: Upload code coverage report to Codecov
       if: success()
